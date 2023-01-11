@@ -24,13 +24,15 @@ function App() {
     { value: "SK", label: "Saskatchewan" },
     { value: "YT", label: "Yukon" },
   ];
-  const [activeLocation, setActiveLocation] = useState("canada");
+  //**APP STATES
+  const [activeLocation, setActiveLocation] = useState("");
   const [lastUpdated, setlastUpdated] = useState("");
   const [summaryData, setSummaryData] = useState({});
   const [timeseriesData, setTimeseriesData] = useState({
     datasets: [],
   });
 
+  //**Options and constants */
   const baseUrl = "https://api.opencovid.ca";
   const timeseriesOptions = {
     responsive: true,
@@ -47,6 +49,7 @@ function App() {
       },
     },
   };
+  //*METHODS
   const getVersion = async () => {
     const res = await fetch(`${baseUrl}/version`);
     const data = await res.json();
@@ -56,12 +59,14 @@ function App() {
     setSummaryData({});
     let res = await fetch(`${baseUrl}/summary?loc=${activeLocation}`);
     let resData = await res.json();
-    let summaryData = resData.summary[0];
+
+    let summaryData = resData.data[0];
     let formattedData = {};
 
     Object.keys(summaryData).map(
       (key) => (formattedData[key] = summaryData[key].toLocaleString())
     );
+
     setSummaryData(formattedData);
   };
   function timeseriesDataMap(fetchedData) {
@@ -140,15 +145,12 @@ function App() {
           />
         </div>
         <div className="dashboard-summary">
-          <Card title="Total Cases" value={summaryData.cumulative_cases} />
-          <Card
-            title="Total Recovered"
-            value={summaryData.cumulative_recovered}
-          />
-          <Card title="Total Deaths" value={summaryData.cumulative_deaths} />
+          <Card title="Total Cases" value={summaryData.cases} />
+          <Card title="Tests Completed" value={summaryData.tests_completed} />
+          <Card title="Total Deaths" value={summaryData.deaths} />
           <Card
             title="Total Vaccinated"
-            value={summaryData.cumulative_avaccine}
+            value={summaryData.vaccine_administration_total_doses}
           />
         </div>
       </div>
